@@ -1,10 +1,10 @@
 const express = require('express');
 const app = express();
+const userRoutes = require('./src/routes/user');
 
-app.use( (req, res, next) => {
-    res.status(200).send({
-        msg: 'Ok!'
-    });
-});
+
+app.use('/user', userRoutes);
+
+
 
 module.exports = app;
