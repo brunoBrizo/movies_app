@@ -4,22 +4,22 @@ const router = express.Router();
 //GETTERS
 router.get('/', (req, res, next) => {
     res.status(200).send({
-        msg: 'Get at users OK'
+        msg: 'Get at movies OK'
     });
 });
 
-router.get('/:user_id', (req, res, next) => {
-    const userId = req.params.user_id;
+router.get('/:movie_id', (req, res, next) => {
+    const movie_id = req.params.movie_id;
     let msg;
-    if (userId == 1){
+    if (movie_id == 1){
         msg = 'Id de usuario especial';
     } else {
         msg = 'Id de usuario normal';
     }
 
     res.status(200).send({
-        msg: msg,
-        user_id: userId 
+        msg,
+        movie_id 
     });
 });
 
@@ -27,21 +27,21 @@ router.get('/:user_id', (req, res, next) => {
 //POST
 router.post('/', (req, res, next) => {
     res.status(201).send({
-        msg: 'Post at users OK'
+        msg: 'Post at movies OK'
     });
 });
 
 //PATCH
 router.patch('/', (req, res, next) => {
     res.status(202).send({
-        msg: 'Patch at users OK'
+        msg: 'Patch at movies OK'
     });
 });
 
 //PATCH
 router.delete('/', (req, res, next) => {
     res.status(203).send({
-        msg: 'Delete at users OK'
+        msg: 'Delete at movies OK'
     });
 });
 
