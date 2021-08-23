@@ -1,8 +1,9 @@
 const express = require("express");
 const router = express.Router();
+const authenticate = require("../logic/authenticate");
 
 //GETTERS
-router.get("/", (req, res, next) => {
+router.get("/", authenticate, (req, res, next) => {
   try {
     res.status(200).send({
       msg: "Get at movies OK",
@@ -14,7 +15,7 @@ router.get("/", (req, res, next) => {
   }
 });
 
-router.get("/:movie_id", (req, res, next) => {
+router.get("/:movie_id", authenticate, (req, res, next) => {
   try {
     const movie_id = req.params.movie_id;
     let msg;

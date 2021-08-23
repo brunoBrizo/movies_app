@@ -1,16 +1,25 @@
 const express = require("express");
 const User = require("../models/user_model");
 const router = express.Router();
+const bcrypt = require("bcrypt");
+const jwt = require("../logic/jwt");
+const authenticate = require("../logic/authenticate");
 
 //GETTERS
-router.get("/", async (req, res) => {
-  const users = await User.findAll();
-  res.status(200).send({
-    users,
-  });
+router.get("/", authenticate, async (req, res) => {
+  try {
+    const users = await User.findAll();
+    res.status(200).send({
+      users,
+    });
+  } catch (error) {
+    res.status(401).send({
+      users,
+    });
+  }
 });
 
-router.get("/:user_id", async (req, res) => {
+router.get("/:user_id", authenticate, async (req, res) => {
   try {
     const userId = req.params.user_id;
     const user = await User.findOne({ where: { id: userId } });
@@ -23,21 +32,33 @@ router.get("/:user_id", async (req, res) => {
 });
 
 //POST
-router.post("/", async (req, res) => {
+router.post("/", authenticate, async (req, res) => {
   try {
-    await User.create(req.body);
-    res.status(201).send({
-      msg: "User created",
-    });
+    var newUser = req.body;
+    var hash = await bcrypt.hash(newUser.password, 10);
+    newUser.password = hash;
+    const userCreated = await User.create(newUser);
+    if (!userCreated) {
+      res.status(406).send({
+        msg: "User not created",
+      });
+    } else {
+      const token = jwt.sign({ user: userCreated.id });
+      res.status(201).send({
+        msg: "User created",
+        password: newUser.password,
+        token: token,
+      });
+    }
   } catch (error) {
-    res.status(501).send({
+    res.status(406).send({
       msg: error.errors[0].message,
     });
   }
 });
 
 //GET FAVOURITE MOVIES
-router.get("/fav-movies", async (req, res) => {
+router.get("/fav-movies", authenticate, async (req, res) => {
   try {
     //get user authenticated
     const userId = req.body.id;
@@ -58,7 +79,7 @@ router.get("/fav-movies", async (req, res) => {
 });
 
 //PATCH
-router.patch("/", async (req, res) => {
+router.patch("/", authenticate, async (req, res) => {
   try {
     const userId = req.body.id;
     if (userId > 0) {
@@ -69,12 +90,12 @@ router.patch("/", async (req, res) => {
         user,
       });
     } else {
-      res.status(501).send({
+      res.status(401).send({
         msg: "User Id must not be empty.",
       });
     }
   } catch (error) {
-    res.status(501).send({
+    res.status(401).send({
       msg: error.errors[0].message,
     });
   }
@@ -85,19 +106,39 @@ router.post("/login", async (req, res) => {
   try {
     const userEmail = req.body.email;
     const userPwd = req.body.password;
-    const user = await User.findOne({
-      where: { email: userEmail, password: userPwd },
+    const result = await User.findOne({
+      where: { email: userEmail },
     });
-    if (user == null) {
-      res.status(404).send({
-        error: "Unknown user",
+
+    if (result == null) {
+      res.status(401).send({
+        error: "Invalid credentials",
       });
     } else {
-      res.status(200).send(user);
+      const match = await bcrypt.compare(userPwd, result.password);
+      if (match) {
+        const { password, updatedAt, createdAt, ...user } = result.toJSON();
+        const token = jwt.sign({ user: user.id });
+        res.status(200).send({ user, token });
+      } else {
+        res.status(401).send({
+          error: "Invalid credentials",
+        });
+      }
     }
   } catch (error) {
     res.status(501).send({
       msg: error,
+    });
+  }
+});
+
+router.get("/me", authenticate, async (req, res) => {
+  try {
+    res.send(req.auth);
+  } catch (error) {
+    res.status(401).send({
+      users,
     });
   }
 });
