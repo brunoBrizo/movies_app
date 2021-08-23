@@ -1,48 +1,38 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
 //GETTERS
-router.get('/', (req, res, next) => {
+router.get("/", (req, res, next) => {
+  try {
     res.status(200).send({
-        msg: 'Get at movies OK'
+      msg: "Get at movies OK",
     });
+  } catch (error) {
+    res.status(501).send({
+      msg: error,
+    });
+  }
 });
 
-router.get('/:movie_id', (req, res, next) => {
+router.get("/:movie_id", (req, res, next) => {
+  try {
     const movie_id = req.params.movie_id;
     let msg;
-    if (movie_id == 1){
-        msg = 'Id de usuario especial';
+    if (movie_id == 1) {
+      msg = "Id de usuario especial";
     } else {
-        msg = 'Id de usuario normal';
+      msg = "Id de usuario normal";
     }
 
     res.status(200).send({
-        msg,
-        movie_id 
+      msg,
+      movie_id,
     });
-});
-
-
-//POST
-router.post('/', (req, res, next) => {
-    res.status(201).send({
-        msg: 'Post at movies OK'
+  } catch (error) {
+    res.status(501).send({
+      msg: error,
     });
-});
-
-//PATCH
-router.patch('/', (req, res, next) => {
-    res.status(202).send({
-        msg: 'Patch at movies OK'
-    });
-});
-
-//PATCH
-router.delete('/', (req, res, next) => {
-    res.status(203).send({
-        msg: 'Delete at movies OK'
-    });
+  }
 });
 
 module.exports = router;
