@@ -41,6 +41,9 @@ User.init(
         notEmpty: true,
       },
     },
+    authToken: {
+      type: DataTypes.STRING,
+    },
   },
   {
     sequelize,
