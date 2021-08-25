@@ -180,5 +180,3 @@ async function _errorHandler(error) {
 
   throw error;
 }
-
-//replicar logica para peliculas = controllers y service

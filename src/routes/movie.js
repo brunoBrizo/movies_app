@@ -1,39 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const authenticate = require("../logic/authenticate");
+const movieController = require("../controllers//movie_controller");
 
-//GETTERS
-router.get("/", authenticate, (req, res, next) => {
-  try {
-    res.status(200).send({
-      msg: "Get at movies OK",
-    });
-  } catch (error) {
-    res.status(501).send({
-      msg: error,
-    });
-  }
-});
+//   /api/movie/  OR  /api/movie/?keyword=venom
+router.get("/", authenticate, movieController.getMovies);
 
-router.get("/:movie_id", authenticate, (req, res, next) => {
-  try {
-    const movie_id = req.params.movie_id;
-    let msg;
-    if (movie_id == 1) {
-      msg = "Id de usuario especial";
-    } else {
-      msg = "Id de usuario normal";
-    }
-
-    res.status(200).send({
-      msg,
-      movie_id,
-    });
-  } catch (error) {
-    res.status(501).send({
-      msg: error,
-    });
-  }
-});
+//   /api/movie/1
+router.get("/:movie_id", authenticate, movieController.getMovieById);
 
 module.exports = router;

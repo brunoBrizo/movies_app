@@ -1,7 +1,5 @@
-const { Model, DataTypes, Association } = require("sequelize");
+const { Model, DataTypes } = require("sequelize");
 const sequelize = require("../database/sequelize");
-const Movie = require("./movie_model");
-const UserFavouriteMovies = require("./user_movie_model");
 
 class User extends Model {}
 User.init(
@@ -16,29 +14,56 @@ User.init(
       unique: true,
       allowNull: false,
       validate: {
-        notEmpty: true,
-        //isEmail: true,
+        notEmpty: {
+          args: true,
+          msg: "Email must not be empty",
+        },
+        max: {
+          args: 250,
+          msg: "Email max length is 250 characters",
+        },
       },
     },
     firstname: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
-        notEmpty: true,
+        notEmpty: {
+          args: true,
+          msg: "Firstname must not be empty",
+        },
+        max: {
+          args: 100,
+          msg: "Firstname max length is 100 characters",
+        },
       },
     },
     lastname: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
-        notEmpty: true,
+        notEmpty: {
+          args: true,
+          msg: "Lastname must not be empty",
+        },
+        max: {
+          args: 100,
+          msg: "Lastname max length is 100 characters",
+        },
       },
     },
     password: {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
-        notEmpty: true,
+        notEmpty: {
+          args: true,
+          msg: "Password must not be empty",
+        },
+        max: {
+          args: 1000,
+          msg: "Password max length is 1000 characters",
+        },
       },
     },
     authToken: {
@@ -51,7 +76,5 @@ User.init(
     timestamps: true,
   }
 );
-
-//TODO: user has many movies
 
 module.exports = User;

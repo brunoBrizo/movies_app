@@ -1,6 +1,4 @@
 const User = require("../models/user_model");
-const bcrypt = require("bcrypt");
-const jwt = require("../logic/jwt");
 const userService = require("../services/user_service");
 const AppError = require("../utils/app_error");
 

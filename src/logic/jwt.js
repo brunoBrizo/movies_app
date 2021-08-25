@@ -7,8 +7,12 @@ const sign = (payload) => {
   });
 };
 
-const verify = (token) => {
-  return jwt.verify(token, jwt_config.secret);
+const verify = async (token) => {
+  try {
+    return jwt.verify(token, jwt_config.secret);
+  } catch (error) {
+    throw error;
+  }
 };
 
 module.exports = {
