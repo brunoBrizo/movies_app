@@ -26,7 +26,7 @@ app.use((req, res, next) => {
   );
 
   if (req.method === "OPTIONS") {
-    res.header("Acces-Control-Allow-Methods", "GET", "POST", "PATCH");
+    res.header("Acces-Control-Allow-Methods", "GET", "POST");
     return res.status(200).send({});
   }
   next();

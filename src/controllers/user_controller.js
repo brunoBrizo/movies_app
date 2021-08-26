@@ -41,7 +41,7 @@ const getUserById = async (req, res, next) => {
 
 const insertUser = async (req, res, next) => {
   try {
-    var user = req.body;
+    const user = req.body;
     const newUser = await userService.insertUser(user);
 
     res.status(201).send({
@@ -54,39 +54,27 @@ const insertUser = async (req, res, next) => {
   }
 };
 
-const getFavouriteMovies = async (req, res, next) => {
+const addFavouriteMovie = async (req, res, next) => {
   try {
-    //get user authenticated
-    let user = req.auth;
-    user = User.findByPk(user.id, {
-      include: {
-        association: "userFavouriteMovies",
-      },
-    });
+    const movie = req.body;
+    const user = req.auth;
+    await userService.addFavouriteMovie(user, movie);
 
     res.status(201).send({
-      user,
+      msg: "Movie added to favourites",
     });
   } catch (error) {
-    next(error);
+    _errorHandler(error, next);
   }
 };
 
-const updateUser = async (req, res, next) => {
+const getFavouriteMovies = async (req, res, next) => {
   try {
-    const userId = req.body.id;
-    if (userId > 0) {
-      const user = await User.findOne({ where: { id: userId } });
-      user.firstname = req.body.firstname;
-      await user.save();
-      res.status(202).send({
-        user,
-      });
-    } else {
-      let error = new Error("User Id must not be empty.");
-      error.status = 401;
-      next(error);
-    }
+    const currentUser = req.auth;
+    const movies = await userService.getFavouriteMovies(currentUser);
+    res.status(201).send({
+      movies,
+    });
   } catch (error) {
     next(error);
   }
@@ -115,14 +103,6 @@ const logout = async (req, res, next) => {
   }
 };
 
-const getUserInfo = async (req, res, next) => {
-  try {
-    res.send(req.auth);
-  } catch (error) {
-    next(error);
-  }
-};
-
 _errorHandler = async (error, next) => {
   if (error.isOperational == null) {
     const error = new AppError(error.message, 500);
@@ -138,8 +118,7 @@ module.exports = {
   getUserById,
   insertUser,
   getFavouriteMovies,
-  updateUser,
   login,
   logout,
-  getUserInfo,
+  addFavouriteMovie,
 };

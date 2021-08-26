@@ -4,6 +4,8 @@ const jwt = require("../logic/jwt");
 const AppError = require("../utils/app_error");
 const validator = require("email-validator");
 const Sequelize = require("sequelize");
+const UserMovieModel = require("../models/user_movie_model");
+const Utils = require("../utils/utils");
 
 async function getUsers() {
   try {
@@ -27,7 +29,7 @@ async function getUserById(userId) {
 async function insertUser(user) {
   try {
     //validations
-    _userInsertValidator(user);
+    await _userInsertValidator(user);
     var hash = await bcrypt.hash(user.password, 10);
     user.password = hash;
     let userCreated = await User.create(user);
@@ -44,6 +46,32 @@ async function insertUser(user) {
       };
       return newUser;
     }
+  } catch (error) {
+    await _errorHandler(error);
+  }
+}
+
+async function addFavouriteMovie(user, movie) {
+  try {
+    //validations
+    await _userAddFavouriteMovieValidator(movie, user.id);
+
+    let newUserMovie = Object.assign(UserMovieModel, movie);
+    newUserMovie.userId = user.id;
+    const result = await UserMovieModel.create(newUserMovie);
+    return result;
+  } catch (error) {
+    await _errorHandler(error);
+  }
+}
+
+async function getFavouriteMovies(currentUser) {
+  try {
+    let userMovies = await UserMovieModel.findAll({
+      where: { userId: currentUser.id },
+    });
+    userMovies = await _parseUserMovieReturn(userMovies);
+    return userMovies;
   } catch (error) {
     await _errorHandler(error);
   }
@@ -94,12 +122,29 @@ module.exports = {
   insertUser,
   login,
   logout,
+  addFavouriteMovie,
+  getFavouriteMovies,
 };
 
 _cleanUserReturn = (user) => {
   const { password, updatedAt, createdAt, authToken, ...result } =
     user.toJSON();
   return result;
+};
+
+_parseUserMovieReturn = (userMovie) => {
+  let userMovieRet = [];
+  userMovie.forEach((u) => {
+    const { updatedAt, ...auxUserMovie } = u.toJSON();
+    auxUserMovie.suggestionForTodayScore = Utils.getRandomInt(0, 100);
+    userMovieRet.push(auxUserMovie);
+  });
+
+  //sorting movies list ascending by suggestionScore
+  userMovieRet.sort(
+    (a, b) => a.suggestionForTodayScore - b.suggestionForTodayScore
+  );
+  return userMovieRet;
 };
 
 _userInsertValidator = async (user) => {
@@ -134,6 +179,52 @@ _userInsertValidator = async (user) => {
     errorMsg = "Password must have at least 5 characters";
   }
   if (!validUser) {
+    throw new AppError(errorMsg, 400);
+  }
+  return true;
+};
+
+_userAddFavouriteMovieValidator = async (movie, userId) => {
+  let errorMsg;
+  let validMovie = true;
+
+  if (!movie.movieId) {
+    errorMsg = "Movie Id must not be empty";
+    validMovie = false;
+  }
+  if (validMovie) {
+    const auxUserMovie = await UserMovieModel.findOne({
+      where: { userId: userId, movieId: movie.movieId },
+    });
+
+    if (auxUserMovie) {
+      errorMsg = "Movie already added as favourite";
+      validMovie = false;
+    }
+  }
+
+  if (validMovie && !movie.original_language) {
+    errorMsg = "Language must not be empty";
+    validMovie = false;
+  }
+
+  if (validMovie && !movie.original_title) {
+    errorMsg = "Title must not be empty";
+    validMovie = false;
+  }
+  if (validMovie && !movie.overview) {
+    errorMsg = "Overview must not be empty";
+    validMovie = false;
+  }
+  if (validMovie && !movie.vote_average) {
+    errorMsg = "Vote average must not be empty";
+    validMovie = false;
+  }
+  if (validMovie && !movie.poster_path) {
+    errorMsg = "Poster path must not be empty";
+    validMovie = false;
+  }
+  if (!validMovie) {
     throw new AppError(errorMsg, 400);
   }
   return true;

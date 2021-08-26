@@ -30,26 +30,6 @@ getMovies = async (keyword) => {
   }
 };
 
-getMovieById = async () => {
-  try {
-    let getMoviesUrl =
-      "https://api.themoviedb.org/3/movie/top_rated?api_key=55195cba1fbda14b0773b0f7ea9e3b7f&language=en-US&page=1";
-
-    const result = await fetch(getMoviesUrl, {
-      method: "get",
-      //body: JSON.stringify(body),
-      headers: { "Content-Type": "application/json" },
-    });
-    const data = result.json();
-    console.log("peliculas: " + data);
-    return data;
-  } catch (error) {
-    console.log("error consumiendo movies: " + error);
-    throw error;
-  }
-};
-
 module.exports = {
   getMovies,
-  getMovieById,
 };

@@ -1,29 +1,16 @@
 const AppError = require("../utils/app_error");
 const themoviedb = require("../logic/themoviedb");
 const Movie = require("../models/movie_model");
+const Utils = require("../utils//utils");
 
 async function getMovies(keyword) {
   try {
     const result = await themoviedb.getMovies(keyword);
-    //console.log(result);
     if (result) {
-      const movies = await _parseResponseToMovieModel(result);
-
-      //sorting movies list ascending by suggestionScore
-      movies.sort((a, b) => a.suggestionScore - b.suggestionScore);
+      const movies = await _parseMovieResponse(result);
       return movies;
     }
     return null;
-  } catch (error) {
-    _errorHandler(error);
-  }
-}
-
-async function getMovieById(movieId) {
-  try {
-    const movie = await themoviedb.getMovieById(movieId);
-    if (movie) return movie;
-    else return null;
   } catch (error) {
     _errorHandler(error);
   }
@@ -45,22 +32,26 @@ async function _errorHandler(error) {
   throw error;
 }
 
-_parseResponseToMovieModel = async (data) => {
+_parseMovieResponse = async (data) => {
   try {
     let lstMovies = [];
 
     data.results.forEach((m) => {
       let auxMovie = Object.assign(new Movie(), {
-        id: m.id,
+        movieId: m.id,
         original_language: m.original_language,
         original_title: m.original_title,
         overview: m.overview,
         vote_average: m.vote_average,
         poster_path: m.poster_path,
-        suggestionScore: _getRandomArbitrary(0, 100),
       });
+      auxMovie.suggestionScore = Utils.getRandomInt(0, 100);
       lstMovies.push(auxMovie);
     });
+
+    //sorting movies list ascending by suggestionScore
+    lstMovies.sort((a, b) => a.suggestionScore - b.suggestionScore);
+
     return lstMovies;
   } catch (error) {
     console.log(error);
@@ -68,11 +59,6 @@ _parseResponseToMovieModel = async (data) => {
   }
 };
 
-_getRandomArbitrary = (min, max) => {
-  return Math.floor(Math.random() * (max - min)) + min;
-};
-
 module.exports = {
   getMovies,
-  getMovieById,
 };

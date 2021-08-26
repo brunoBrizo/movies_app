@@ -17,28 +17,6 @@ const getMovies = async (req, res, next) => {
   }
 };
 
-const getMovieById = async (req, res, next) => {
-  try {
-    const movieId = req.params.movie_id;
-    if (!movieId) {
-      throw new AppError("Movie Id must not be empty", 400);
-    }
-    if (isNaN(movieId)) {
-      throw new AppError("Movie Id must be a number", 400);
-    }
-    const movie = await movieService.getMovieById(movieId);
-    if (movie) {
-      res.status(200).send({
-        movie,
-      });
-    } else {
-      throw new AppError("Movie not found", 404);
-    }
-  } catch (error) {
-    _errorHandler(error, next);
-  }
-};
-
 _errorHandler = async (error, next) => {
   if (error.isOperational == null) {
     const error = new AppError(error.message, 500);
@@ -51,5 +29,4 @@ _errorHandler = async (error, next) => {
 
 module.exports = {
   getMovies,
-  getMovieById,
 };
