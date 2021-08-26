@@ -1,3 +1,11 @@
+/*
+    {
+        "created_by": "Bruno Brizolara",
+        "created_at": "22/08/2021",
+        "description": "user model with validations (persisted on database)",
+        "modified_at": "25/08/2021"
+    }
+*/
 const { Model, DataTypes } = require("sequelize");
 const sequelize = require("../database/sequelize");
 

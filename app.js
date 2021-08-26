@@ -1,3 +1,11 @@
+/*
+    {
+        "created_by": "Bruno Brizolara",
+        "created_at": "21/08/2021",
+        "description": "configuration of our app",
+        "modified_at": "25/08/2021"
+    }
+*/
 const express = require("express");
 const app = express();
 const morgan = require("morgan");

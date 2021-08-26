@@ -1,3 +1,11 @@
+/*
+    {
+        "created_by": "Bruno Brizolara",
+        "created_at": "23/08/2021",
+        "description": "handle movie requests and parse response to the user",
+        "modified_at": "25/08/2021"
+    }
+*/
 const AppError = require("../utils/app_error");
 const movieService = require("../services/movie_service");
 
@@ -18,11 +26,11 @@ const getMovies = async (req, res, next) => {
 };
 
 _errorHandler = async (error, next) => {
+  //check if its a custom app error
   if (error.isOperational == null) {
     const error = new AppError(error.message, 500);
     return next(error);
   } else {
-    //already getting a custom app error
     return next(error);
   }
 };

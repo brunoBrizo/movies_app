@@ -1,3 +1,11 @@
+/*
+    {
+        "created_by": "Bruno Brizolara",
+        "created_at": "23/08/2021",
+        "description": "handles users logic and errors",
+        "modified_at": "25/08/2021"
+    }
+*/
 const User = require("../models/user_model");
 const bcrypt = require("bcrypt");
 const jwt = require("../logic/jwt");
@@ -140,7 +148,7 @@ _parseUserMovieReturn = (userMovie) => {
     userMovieRet.push(auxUserMovie);
   });
 
-  //sorting movies list ascending by suggestionScore
+  //sorting user movies list ascending by suggestionForTodayScore
   userMovieRet.sort(
     (a, b) => a.suggestionForTodayScore - b.suggestionForTodayScore
   );

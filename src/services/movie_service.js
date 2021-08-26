@@ -1,4 +1,11 @@
-const AppError = require("../utils/app_error");
+/*
+    {
+        "created_by": "Bruno Brizolara",
+        "created_at": "24/08/2021",
+        "description": "handles movies logic and errors",
+        "modified_at": "25/08/2021"
+    }
+*/
 const themoviedb = require("../logic/themoviedb");
 const Movie = require("../models/movie_model");
 const Utils = require("../utils//utils");
@@ -12,24 +19,8 @@ async function getMovies(keyword) {
     }
     return null;
   } catch (error) {
-    _errorHandler(error);
+    throw error;
   }
-}
-
-async function _errorHandler(error) {
-  let msg, status;
-  //   if (error instanceof Sequelize.Error) {
-  //     if (error.errors.length > 0) {
-  //       msg = error.errors[0].message;
-  //       status = 400;
-  //     } else {
-  //       status = 500;
-  //       msg = "Server unavailable";
-  //     }
-  //     throw new AppError(msg, status);
-  //   }
-
-  throw error;
 }
 
 _parseMovieResponse = async (data) => {
@@ -45,6 +36,8 @@ _parseMovieResponse = async (data) => {
         vote_average: m.vote_average,
         poster_path: m.poster_path,
       });
+
+      //adding new field suggestionScore with random int
       auxMovie.suggestionScore = Utils.getRandomInt(0, 100);
       lstMovies.push(auxMovie);
     });

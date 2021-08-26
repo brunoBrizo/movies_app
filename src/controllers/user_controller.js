@@ -1,3 +1,11 @@
+/*
+    {
+        "created_by": "Bruno Brizolara",
+        "created_at": "22/08/2021",
+        "description": "handle user requests and parse response to the user",
+        "modified_at": "26/08/2021"
+    }
+*/
 const User = require("../models/user_model");
 const userService = require("../services/user_service");
 const AppError = require("../utils/app_error");

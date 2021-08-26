@@ -1,3 +1,11 @@
+/*
+    {
+        "created_by": "Bruno Brizolara",
+        "created_at": "22/08/2021",
+        "description": "configuring the sequelize database",
+        "modified_at": ""
+    }
+*/
 const { Sequelize } = require("sequelize");
 const { database } = require("../logic/config");
 

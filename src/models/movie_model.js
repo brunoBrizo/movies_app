@@ -1,3 +1,11 @@
+/*
+    {
+        "created_by": "Bruno Brizolara",
+        "created_at": "23/08/2021",
+        "description": "movie class for parsing http responses (NOT persisted on database)",
+        "modified_at": "25/08/2021"
+    }
+*/
 class Movie {
   constructor(
     movieId,
