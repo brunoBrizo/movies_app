@@ -6,44 +6,25 @@
         "modified_at": "26/08/2021"
     }
 */
+const { response } = require("express");
 const User = require("../models/user_model");
 const userService = require("../services/user_service");
 const AppError = require("../utils/app_error");
+require("dotenv").config();
 
 const getUsers = async (req, res, next) => {
   try {
     const users = await userService.getUsers();
     if (users) {
       res.status(200).send({
+        status: 200,
         users,
       });
     } else {
       throw new AppError("No users found", 400);
     }
   } catch (error) {
-    next(error);
-  }
-};
-
-const getUserById = async (req, res, next) => {
-  try {
-    const userId = req.params.user_id;
-    if (!userId) {
-      throw new AppError("User Id must not be empty", 400);
-    }
-    if (isNaN(userId)) {
-      throw new AppError("User Id must be a number", 400);
-    }
-    const user = await userService.getUserById(userId);
-    if (user) {
-      res.status(200).send({
-        user,
-      });
-    } else {
-      throw new AppError("User not found", 404);
-    }
-  } catch (error) {
-    _errorHandler(error, next);
+    await _errorHandler(error, next);
   }
 };
 
@@ -53,45 +34,51 @@ const insertUser = async (req, res, next) => {
     const newUser = await userService.insertUser(user);
 
     res.status(201).send({
-      msg: "User created",
+      status: 201,
       user: newUser.user,
       token: newUser.token,
     });
   } catch (error) {
-    _errorHandler(error, next);
+    await _errorHandler(error, next);
   }
 };
 
 const addFavouriteMovie = async (req, res, next) => {
   try {
     const movie = req.body;
-    const user = req.auth;
-    await userService.addFavouriteMovie(user, movie);
 
-    res.status(201).send({
-      msg: "Movie added to favourites",
-    });
+    //get authenticated user
+    const currentUser = req.auth;
+    await userService.addFavouriteMovie(currentUser, movie);
+
+    res.status(201).send();
   } catch (error) {
-    _errorHandler(error, next);
+    await _errorHandler(error, next);
   }
 };
 
 const getFavouriteMovies = async (req, res, next) => {
   try {
+    //get authenticated user
     const currentUser = req.auth;
     const movies = await userService.getFavouriteMovies(currentUser);
-    res.status(201).send({
+    res.status(200).send({
+      status: 200,
       movies,
     });
   } catch (error) {
-    next(error);
+    await _errorHandler(error, next);
   }
 };
 
 const login = async (req, res, next) => {
   try {
     const result = await userService.login(req.body.email, req.body.password);
-    res.status(200).send(result);
+    res.status(200).send({
+      status: 200,
+      user: result.user,
+      token: result.token,
+    });
   } catch (error) {
     await _errorHandler(error, next);
   }
@@ -99,31 +86,26 @@ const login = async (req, res, next) => {
 
 const logout = async (req, res, next) => {
   try {
+    //get authenticated user
     const currentUser = req.auth;
-    if (currentUser.authToken === req.body.token) {
-      const result = await userService.logout(currentUser);
-      res.status(200).send();
-    } else {
-      throw new AppError("Unauthorized", 401);
-    }
+    const result = await userService.logout(currentUser);
+
+    res.status(200).send();
   } catch (error) {
     await _errorHandler(error, next);
   }
 };
 
 _errorHandler = async (error, next) => {
+  //already getting a custom app error
   if (error.isOperational == null) {
-    const error = new AppError(error.message, 500);
-    return next(error);
-  } else {
-    //already getting a custom app error
-    return next(error);
+    error = new AppError(error.message, 500);
   }
+  return next(error);
 };
 
 module.exports = {
   getUsers,
-  getUserById,
   insertUser,
   getFavouriteMovies,
   login,

@@ -9,8 +9,11 @@
 const User = require("../models/user_model");
 const UserFavouriteMovies = require("../models/user_movie_model");
 
-User.hasMany(UserFavouriteMovies);
-
+//User has many UserFavouriteMovies
+//UserFavouriteMovies belongs to one User
+User.hasMany(UserFavouriteMovies, {
+  onDelete: "CASCADE",
+});
 UserFavouriteMovies.belongsTo(User, {
   foreignKey: "userId",
 });

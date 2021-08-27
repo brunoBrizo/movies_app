@@ -12,6 +12,7 @@ class AppError extends Error {
     this.status = status;
     this.isOperational = true;
 
+    //get stack trace
     Error.captureStackTrace(this, this.constructor);
   }
 }

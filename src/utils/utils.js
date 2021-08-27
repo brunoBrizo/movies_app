@@ -8,6 +8,7 @@
 */
 
 //MAX is not included
+//for random between 0 and 99 => getRandomInt(0, 100)
 getRandomInt = (min, max) => {
   return Math.floor(Math.random() * (max - min)) + min;
 };

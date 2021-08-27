@@ -1,0 +1,154 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Movies App",
+    "description": "A simple movies API",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Bruno Brizolara",
+      "email": "bbrizolara7@gmail.com",
+      "url": "https://arkamsoftware.com"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080/api/v1/",
+      "description": "Dev API"
+    }
+  ],
+  "paths": {
+    "/movie": {
+      "get": {
+        "summary": "Get movies from themoviedbs API",
+        "tags": ["Movies"],
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "keyword",
+            "in": "query",
+            "description": "Anything related to a movie",
+            "required": false
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Unauthorized"
+          },
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Movie"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error"
+          }
+        }
+      }
+    },
+    "/user": {
+      "post": {
+        "summary": "Register a new user",
+        "tags": ["Users"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              },
+              "examples": {
+                "user": {
+                  "value": {
+                    "id": 0,
+                    "email": "bbrizolara7@gmail.com",
+                    "firstname": "Bruno",
+                    "lastname": "Brizolara",
+                    "password": "12345"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "401": {
+            "description": "Unauthorized"
+          },
+          "201": {
+            "description": "User created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "email": {
+            "type": "string"
+          },
+          "firstname": {
+            "type": "string"
+          },
+          "lastname": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "Movie": {
+        "type": "object",
+        "properties": {
+          "movieId": {
+            "type": "number"
+          },
+          "original_language": {
+            "type": "string"
+          },
+          "original_title": {
+            "type": "string"
+          },
+          "overview": {
+            "type": "string"
+          },
+          "poster_path": {
+            "type": "string"
+          },
+          "vote_average": {
+            "type": "number"
+          }
+        }
+      }
+    }
+  },
+  "securitySchemes": {
+    "bearerAuth": {
+      "type": "http",
+      "scheme": "bearer",
+      "bearerFormat": "JWT"
+    }
+  }
+}

@@ -15,6 +15,7 @@ const getMovies = async (req, res, next) => {
     const movies = await movieService.getMovies(keyword);
     if (movies) {
       res.status(200).send({
+        status: 200,
         movies,
       });
     } else {

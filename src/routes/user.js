@@ -2,7 +2,7 @@
     {
         "created_by": "Bruno Brizolara",
         "created_at": "21/08/2021",
-        "description": "user api routes, delegates logic to movieController",
+        "description": "user api routes, delegates logic to userController",
         "modified_at": "25/08/2021"
     }
 */
@@ -13,9 +13,6 @@ const userController = require("../controllers/user_controller");
 
 //   /api/user/
 router.get("/", authenticate, userController.getUsers);
-
-//   /api/user/1
-//router.get("/:user_id", authenticate, userController.getUserById);
 
 //   /api/user/fav-movies
 router.get("/fav-movies", authenticate, userController.getFavouriteMovies);

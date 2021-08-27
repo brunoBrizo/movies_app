@@ -2,7 +2,7 @@
     {
         "created_by": "Bruno Brizolara",
         "created_at": "24/08/2021",
-        "description": "handles movies logic and errors",
+        "description": "handles movies logic",
         "modified_at": "25/08/2021"
     }
 */

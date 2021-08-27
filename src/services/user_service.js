@@ -2,7 +2,7 @@
     {
         "created_by": "Bruno Brizolara",
         "created_at": "23/08/2021",
-        "description": "handles users logic and errors",
+        "description": "handles users logic, validations and db querys",
         "modified_at": "25/08/2021"
     }
 */
@@ -15,16 +15,16 @@ const Sequelize = require("sequelize");
 const UserMovieModel = require("../models/user_movie_model");
 const Utils = require("../utils/utils");
 
-async function getUsers() {
+getUsers = async () => {
   try {
     const users = await User.findAll();
     return users;
   } catch (error) {
     _errorHandler(error);
   }
-}
+};
 
-async function getUserById(userId) {
+getUserById = async (userId) => {
   try {
     const user = await User.findOne({ where: { id: userId } });
     if (user) return _cleanUserReturn(user);
@@ -32,20 +32,26 @@ async function getUserById(userId) {
   } catch (error) {
     _errorHandler(error);
   }
-}
+};
 
-async function insertUser(user) {
+insertUser = async (user) => {
   try {
-    //validations
+    //validation
     await _userInsertValidator(user);
+
+    //hash incoming password
     var hash = await bcrypt.hash(user.password, 10);
     user.password = hash;
+
     let userCreated = await User.create(user);
     if (!userCreated) {
       throw new AppError("User not created", 500);
     } else {
+      //user created, creating a token
       const token = jwt.sign({ user: userCreated.id });
       userCreated.authToken = token;
+
+      //updating users token on db
       await userCreated.save();
       user = _cleanUserReturn(userCreated);
       const newUser = {
@@ -57,23 +63,26 @@ async function insertUser(user) {
   } catch (error) {
     await _errorHandler(error);
   }
-}
+};
 
-async function addFavouriteMovie(user, movie) {
+addFavouriteMovie = async (user, movie) => {
   try {
     //validations
     await _userAddFavouriteMovieValidator(movie, user.id);
 
+    //parsing incoming movie to UserMovieModel
     let newUserMovie = Object.assign(UserMovieModel, movie);
+
+    //assign user FK
     newUserMovie.userId = user.id;
     const result = await UserMovieModel.create(newUserMovie);
     return result;
   } catch (error) {
     await _errorHandler(error);
   }
-}
+};
 
-async function getFavouriteMovies(currentUser) {
+getFavouriteMovies = async (currentUser) => {
   try {
     let userMovies = await UserMovieModel.findAll({
       where: { userId: currentUser.id },
@@ -83,10 +92,11 @@ async function getFavouriteMovies(currentUser) {
   } catch (error) {
     await _errorHandler(error);
   }
-}
+};
 
-async function login(userEmail, userPwd) {
+login = async (userEmail, userPwd) => {
   try {
+    //validation
     await _userLoginValidator(userEmail, userPwd);
     let result = await User.findOne({
       where: { email: userEmail },
@@ -94,11 +104,15 @@ async function login(userEmail, userPwd) {
     if (!result) {
       throw new AppError("Invalid credentials", 401);
     } else {
+      //checking if pwd matches
       const match = await bcrypt.compare(userPwd, result.password);
       if (match) {
         const token = jwt.sign({ user: result.id });
+
+        //updating users token on db
         result.authToken = token;
         await result.save();
+
         const user = _cleanUserReturn(result);
         const response = {
           user,
@@ -112,17 +126,18 @@ async function login(userEmail, userPwd) {
   } catch (error) {
     await _errorHandler(error);
   }
-}
+};
 
-async function logout(user) {
+logout = async (user) => {
   try {
+    //updating user token on db
     user.authToken = null;
     await user.save();
     return true;
   } catch (error) {
     await _errorHandler(error);
   }
-}
+};
 
 module.exports = {
   getUsers,
@@ -135,6 +150,7 @@ module.exports = {
 };
 
 _cleanUserReturn = (user) => {
+  //removing attributes for the response
   const { password, updatedAt, createdAt, authToken, ...result } =
     user.toJSON();
   return result;
@@ -142,8 +158,12 @@ _cleanUserReturn = (user) => {
 
 _parseUserMovieReturn = (userMovie) => {
   let userMovieRet = [];
+
+  //removing attributes for the response
   userMovie.forEach((u) => {
-    const { updatedAt, ...auxUserMovie } = u.toJSON();
+    const { updatedAt, userId, ...auxUserMovie } = u.toJSON();
+
+    //adding new field suggestionForTodayScore with random int
     auxUserMovie.suggestionForTodayScore = Utils.getRandomInt(0, 100);
     userMovieRet.push(auxUserMovie);
   });
@@ -264,6 +284,7 @@ _userLoginValidator = (userEmail, userPwd) => {
   return true;
 };
 
+//trying a different function syntax
 async function _errorHandler(error) {
   let msg, status;
   if (error instanceof Sequelize.Error) {
@@ -274,7 +295,7 @@ async function _errorHandler(error) {
       status = 500;
       msg = "Server unavailable";
     }
-    throw new AppError(msg, status);
+    error = new AppError(msg, status);
   }
 
   throw error;

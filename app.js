@@ -9,21 +9,24 @@
 const express = require("express");
 const app = express();
 const morgan = require("morgan");
-const bodyParser = require("body-parser");
 const sequelize = require("./src/database/sequelize");
 const AppError = require("./src/utils/app_error");
 require("./src/database/association");
+const { userRoutes, movieRoutes } = require("./src/routes");
+const swaggerUi = require("swagger-ui-express");
+const swaggerJson = require("./docs/swagger.json");
 
-const userRoutes = require("./src/routes/user");
-const movieRoutes = require("./src/routes/movie");
-const { json } = require("body-parser");
-
-sequelize.sync().then(() => console.log("db ready"));
+sequelize.sync();
 
 app.use(morgan("dev"));
-app.use(bodyParser.urlencoded({ extended: false })); //accept only simple data
-app.use(json());
+
+//accept only simple data
+app.use(express.urlencoded({ extended: false }));
+
+//parsing json objects
+app.use(express.json());
 app.use((req, res, next) => {
+  //cors handler
   res.header("Acces-Control-Allow-Origin", "*");
   res.header(
     "Acces-Control-Allow-Header",
@@ -33,6 +36,7 @@ app.use((req, res, next) => {
     "Authorization"
   );
 
+  //allow only get/post methods
   if (req.method === "OPTIONS") {
     res.header("Acces-Control-Allow-Methods", "GET", "POST");
     return res.status(200).send({});
@@ -40,10 +44,12 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use("/api/user", userRoutes);
-app.use("/api/movie", movieRoutes);
+//adding routes
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerJson));
+app.use("/api/v1/user", userRoutes);
+app.use("/api/v1/movie", movieRoutes);
 
-//404 NOT FOUND
+//404 NOT FOUND handler
 app.use((req, res, next) => {
   next(new AppError("Not found", 404));
 });

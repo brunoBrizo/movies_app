@@ -17,6 +17,6 @@ module.exports = {
   },
   jwt_config: {
     secret: process.env.JWT_SECRET,
-    expiresIn: process.env.JWT_EXPIRESIN, //expires in 24hours
+    expiresIn: parseInt(process.env.JWT_EXPIRESIN), //expires in 24hours
   },
 };
