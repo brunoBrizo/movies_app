@@ -40,14 +40,21 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Movie"
+                    "$ref": "#/components/schemas/AllMovies"
                   }
                 }
               }
             }
           },
           "400": {
-            "description": "Validation error"
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppError"
+                }
+              }
+            }
           }
         }
       }
@@ -85,13 +92,139 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/User"
+                  "$ref": "#/components/schemas/UserInfo"
                 }
               }
             }
           },
           "400": {
-            "description": "Validation error"
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/login": {
+      "post": {
+        "summary": "Login to get a JWT",
+        "tags": ["Users"],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Login"
+              },
+              "examples": {
+                "login": {
+                  "value": {
+                    "email": "bbrizolara7@gmail.com",
+                    "password": "12345"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "401": {
+            "description": "Unauthorized"
+          },
+          "200": {
+            "description": "Login ok",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserInfo"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/logout": {
+      "post": {
+        "summary": "Logout to invalidate a JWT",
+        "tags": ["Users"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "401": {
+            "description": "Unauthorized"
+          },
+          "200": {
+            "description": "Logout ok"
+          }
+        }
+      }
+    },
+    "/user/fav-movies": {
+      "get": {
+        "summary": "Get favourite movies of logged User",
+        "tags": ["Users"],
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "401": {
+            "description": "Unauthorized"
+          },
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "$ref": "#/components/schemas/FavMovies"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/add-fav-movie": {
+      "get": {
+        "summary": "Add favourite movie for logged User",
+        "tags": ["Users"],
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AllMovies"
+              }
+            }
+          }
+        },
+        "responses": {
+          "401": {
+            "description": "Unauthorized"
+          },
+          "201": {
+            "description": "Movie added as favourite"
+          },
+          "400": {
+            "description": "Validation error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppError"
+                }
+              }
+            }
           }
         }
       }
@@ -119,7 +252,35 @@
           }
         }
       },
-      "Movie": {
+      "UserInfo": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "number"
+          },
+          "user": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "email": {
+                "type": "string"
+              },
+              "firstname": {
+                "type": "string"
+              },
+              "lastname": {
+                "type": "string"
+              }
+            }
+          },
+          "token": {
+            "type": "string"
+          }
+        }
+      },
+      "AllMovies": {
         "type": "object",
         "properties": {
           "movieId": {
@@ -139,6 +300,77 @@
           },
           "vote_average": {
             "type": "number"
+          },
+          "suggestionScore": {
+            "type": "number"
+          }
+        }
+      },
+      "AppError": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "number"
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "Login": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "FavMovie": {
+        "type": "object",
+        "properties": {
+          "movieId": {
+            "type": "number"
+          },
+          "original_language": {
+            "type": "string"
+          },
+          "original_title": {
+            "type": "string"
+          },
+          "overview": {
+            "type": "string"
+          },
+          "poster_path": {
+            "type": "string"
+          },
+          "vote_average": {
+            "type": "number"
+          },
+          "suggestionScore": {
+            "type": "number"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "suggestionForTodayScore": {
+            "type": "number"
+          }
+        }
+      },
+      "FavMovies": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "number"
+          },
+          "movies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FavMovie"
+            }
           }
         }
       }
