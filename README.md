@@ -12,7 +12,7 @@ A simple API where you can:
 ### Starting the project
 
 - Clone this project
-- Run <b>npm init</b>
+- Run <b>npm install</b>
 - Run <b>npm start</b>
 
 ### Documentation
