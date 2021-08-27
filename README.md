@@ -3,7 +3,7 @@
 A simple API where you can:
 
 - Register users
-- Get movies from <a href="https://www.themoviedb.org/">themoviedb.org</a>
+- Get movies from <a href="https://www.themoviedb.org/" target="_blank">themoviedb.org</a>
 - Add favourite movies
 - Get favourite movies
 - Login to get a JWT
