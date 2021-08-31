@@ -14,7 +14,14 @@ require("dotenv").config();
 
 const getUsers = async (req, res, next) => {
   try {
-    const users = await userService.getUsers();
+    let { limit = 5, from = 0 } = req.query;
+    if (isNaN(limit)) {
+      limit = 5;
+    }
+    if (isNaN(from)) {
+      from = 0;
+    }
+    const users = await userService.getUsers(limit, from);
     if (users) {
       res.status(200).send({
         status: 200,

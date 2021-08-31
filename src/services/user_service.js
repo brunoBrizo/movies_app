@@ -15,9 +15,12 @@ const Sequelize = require("sequelize");
 const UserMovieModel = require("../models/user_movie_model");
 const Utils = require("../utils/utils");
 
-getUsers = async () => {
+getUsers = async (limit, offset) => {
   try {
-    const users = await User.findAll();
+    const users = await User.findAndCountAll({
+      limit: limit,
+      offset: offset,
+    });
     return users;
   } catch (error) {
     _errorHandler(error);
